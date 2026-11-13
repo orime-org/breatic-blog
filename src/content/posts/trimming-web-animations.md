@@ -7,57 +7,60 @@ author: Breatic team
 discussion: 1509
 ---
 
-A web animation can play in a browser. But putting it in a video timeline requires more than a play button: you need to trim it, move it, duplicate it, and jump directly to a particular moment.
+Take a 10-second web animation. Keep seconds 3–6, place that clip at second 20 of a video timeline, and move the playhead to second 21.
 
-In Breatic, a web animation is an editable timeline clip. The source remains a web animation; the timeline decides which part to show and when to show it.
+The preview should show the animation at its original second 4. It should also let you drag backward, jump to another frame, or use a different part of the same animation in a second clip.
 
-## A cut changes the range, not the source
+In Breatic, the timeline controls the animation's time through a seekable playback runtime. Trimming records a source range; the original animation stays intact.
 
-Each copy has a position on the timeline, an in-point in the original animation, and a duration. Dragging either end of a clip changes its range while leaving the source intact.
+## Represent the edit as a range
 
-Take a 10-second animation and keep only seconds 3–6. Place that three-second clip at second 20 of the timeline. When the playhead reaches second 21, the animation needs to show its original second 4.
-
-At normal playback speed, the mapping is:
+Each clip records three positions: where it starts on the timeline, where it starts in its source, and how long it lasts. At normal playback speed:
 
 ```text
-animation time = source in-point + timeline time − clip start
-           4s =             3s +           21s −        20s
+source time = source in-point + timeline time − clip start
+         4s =             3s +           21s −        20s
 ```
 
-The implementation stores positions as frames and accounts for the source frame rate, the timeline frame rate, and the clip's playback rate. The requested timeline frame is clamped inside the clip's visible range.
+Moving this clip from second 20 to second 30 changes when it appears. Its first visible source moment is still second 3. Trimming the right edge changes its duration. Neither operation rewrites the animation source.
 
-Two copies can therefore refer to the same animation while keeping different in-points and durations. Trimming or deleting one copy does not change the other copy or the original animation.
+The implementation stores frame positions, accounts for the source and timeline frame rates and the clip's playback rate, and clamps the requested frame inside the clip's range. The mapping lives in [web-animation-host.ts](https://github.com/orime-org/breatic/blob/f350d3eb165f6505bd9a97b484109363028aa6de/packages/web/src/spaces/timeline/web-animation-host.ts#L105).
 
-## The animation needs a time-addressable runtime
+## Give the timeline control of the animation clock
 
-This model depends on the animation runtime being able to render a requested time. It works with animation packages prepared for Breatic's HyperFrames-based playback runtime. It does not make an arbitrary web page seekable.
+The animation must be able to render a requested time directly. Breatic uses animation packages prepared for a HyperFrames-based runtime, with a `renderSeek(time)` entry point. An arbitrary web page does not acquire that capability just by being placed in an iframe.
 
-The timeline maps the playhead position to source time and asks the animation runtime to render that time. Moving a clip later in the sequence changes when it appears, without changing the source moment at its beginning.
+The preview runs each active animation instance in an iframe and sends it the source time calculated from the playhead. When two copies overlap, they can be at different source times; the preview allocates independently driven instances for them. An [instance pool](https://github.com/orime-org/breatic/blob/f350d3eb165f6505bd9a97b484109363028aa6de/packages/web/src/spaces/timeline/web-instance-pool.ts) handles visible copies, preloading, and reuse.
 
-The host-side mapping is in [web-animation-host.ts](https://github.com/orime-org/breatic/blob/f350d3eb165f6505bd9a97b484109363028aa6de/packages/web/src/spaces/timeline/web-animation-host.ts#L105).
+The edit belongs to the copy. Changing or deleting one copy leaves other copies and the original animation intact.
 
 ## A seek request is not a ready frame
 
-The preview runs the animation inside an iframe. Sending a new time to the iframe and immediately resuming the rest of the timeline would leave a gap between the requested state and the frame the page is preparing.
+Calculating the time is straightforward. Coordinating the iframe with the rest of the preview needs another step: an acknowledgement that the requested state is ready.
 
-The page-side bridge calls `renderSeek(time)`, waits for `document.fonts.ready` and two animation frames, and then acknowledges the latest request. This is the readiness signal used by the preview, rather than an assertion that the browser has exposed a pixel-perfect paint-completion event.
+The page-side bridge:
 
-Sessions and sequence numbers matter here. If the playhead moves again before an earlier request finishes, an old response must not make the new request appear complete. The page suppresses superseded replies; the host checks the session and sequence of replies it receives.
+1. Receives a seek request containing a session, sequence, and time.
+2. Calls `renderSeek(time)`.
+3. Waits for `document.fonts.ready` and two animation frames.
+4. Replies if a newer seek has not superseded the request.
 
-The bridge is small enough to read in [web-animation-bridge.ts](https://github.com/orime-org/breatic/blob/f350d3eb165f6505bd9a97b484109363028aa6de/packages/shared/src/timeline/web-animation-bridge.ts).
+Consider dragging the playhead to a later moment, then immediately backward. The earlier request may still have pending asynchronous work. Its completion must not make the newer request appear ready.
 
-## Sharing a clock with video
+The page suppresses superseded replies, and the host accepts a readiness reply only for the current session and latest sequence. A reload opens a new session. The handshake is implemented in [web-animation-bridge.ts](https://github.com/orime-org/breatic/blob/f350d3eb165f6505bd9a97b484109363028aa6de/packages/shared/src/timeline/web-animation-bridge.ts) and the host linked above.
 
-The timeline drives visible video layers and web-animation copies from a shared clock. When a layer needs positioning or is not ready, the preview can hold at its current frame instead of letting the other layers run ahead.
+Waiting for fonts and two animation frames is the preview's readiness convention. It is not a browser-provided guarantee that every pixel has finished painting.
 
-The latest Timeline changes add layered preview playback and controls to move, resize, and rotate video and web-animation layers. Combined with the existing trimming support, this lets the same animation appear in several independently edited clips alongside video.
+## Keep video and web-animation layers together
 
-Those layer controls are described in [PR #1503](https://github.com/orime-org/breatic/pull/1503). The trimming support predates that change.
+Visible video layers and web-animation copies follow a shared timeline clock. When a layer needs positioning or is not ready, the preview can hold at its current frame rather than letting the other layers run ahead.
 
-## What is available in this snapshot
+Once the animation can be addressed in time, the timeline can treat it as a clip: trim it, move it, duplicate it, and combine it with video. The newer layer controls also let you adjust its position, scale, and rotation in the preview.
 
-This article describes the implementation at commit [`f350d3eb`](https://github.com/orime-org/breatic/commit/f350d3eb165f6505bd9a97b484109363028aa6de), merged on November 13, 2026. At the time of writing, these changes were in the main branch and had not shipped in a new release.
+The interactive diagram below shows the source-time mapping from the opening example. Drag its playhead to see how timeline time becomes animation time. It is an explanatory diagram, not a recording of Breatic.
 
-The scope here is editing and preview. Video export remains future work.
+## Implementation snapshot and limits
 
-The interactive diagram below illustrates the time mapping from the example. It is an explanation of the mapping, not a recording of the product.
+This article describes commit [`f350d3eb`](https://github.com/orime-org/breatic/commit/f350d3eb165f6505bd9a97b484109363028aa6de), merged on November 13, 2026. The move, resize, rotate, and layered-preview changes are in [PR #1503](https://github.com/orime-org/breatic/pull/1503); trimming support predates that PR.
+
+At the time of writing, those changes were merged into the main branch and had not shipped in a new release. This implementation covers editing and preview. Video export remains future work.

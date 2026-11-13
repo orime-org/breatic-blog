@@ -1,0 +1,18 @@
+{
+  "name": "breatic-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1 --port 8890",
+    "build": "astro build && node scripts/write-domain.mjs",
+    "preview": "astro preview --host 127.0.0.1 --port 8890",
+    "check:site": "node scripts/check-site.mjs"
+  },
+  "dependencies": {
+    "astro": "7.4.11"
+  }
+}

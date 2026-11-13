@@ -1,0 +1,20 @@
+<figure class="trim-demo" aria-labelledby="demo-caption">
+  <div class="demo-heading"><span class="eyebrow">Try the time mapping</span><output id="animation-time">Source 4.0s</output></div>
+  <div class="demo-stage"><div class="demo-grid"></div><div class="demo-orbit" style="--angle:144deg"><div></div></div><span class="demo-stage-label">Original animation · 10 seconds</span></div>
+  <label for="playhead">Timeline playhead <output id="timeline-time">21.0s</output></label>
+  <input id="playhead" type="range" min="20" max="23" value="21" step="0.1" />
+  <div class="demo-ticks"><span>20s · clip starts</span><span>23s · clip ends</span></div>
+  <div class="demo-equation"><span id="source-number">4.0</span>s <small>= 3s + <span id="timeline-number">21.0</span>s − 20s</small></div>
+  <figcaption id="demo-caption">Illustrative diagram, not a recording of Breatic. Drag the playhead to see the source time change. The exact clip end is excluded during playback.</figcaption>
+</figure>
+<script>
+  const slider = document.querySelector<HTMLInputElement>('#playhead');
+  slider?.addEventListener('input', () => {
+    const timeline = Number(slider.value); const source = 3 + timeline - 20;
+    document.querySelector('#timeline-time')!.textContent = `${timeline.toFixed(1)}s`;
+    document.querySelector('#animation-time')!.textContent = `Source ${source.toFixed(1)}s`;
+    document.querySelector('#source-number')!.textContent = source.toFixed(1);
+    document.querySelector('#timeline-number')!.textContent = timeline.toFixed(1);
+    (document.querySelector('.demo-orbit') as HTMLElement).style.setProperty('--angle', `${source / 10 * 360}deg`);
+  });
+</script>

@@ -1,0 +1,22 @@
+---
+import { community } from '../lib/site';
+const { number } = Astro.props;
+const url = number ? `${community}/${number}` : `${community}/categories/announcements`;
+---
+<section class="comments" aria-labelledby="discussion-heading"><div class="section-heading"><h2 id="discussion-heading">Continue the conversation</h2><a href={url} target="_blank" rel="noopener noreferrer">Open on GitHub ↗</a></div><p>Questions about the implementation? Join the discussion. Reading is public; commenting requires a GitHub account.</p>
+<div id="article-comments" data-discussion={number}>
+  <button class="load-comments" type="button">Load comments from GitHub</button>
+  <p class="comment-note">Comments are provided by giscus. Loading them connects to giscus and GitHub; signing in authorizes giscus to post your comments.</p>
+</div>
+<noscript><p><a href={url} target="_blank" rel="noopener noreferrer">Read and reply on GitHub</a></p></noscript>
+</section>
+<script>
+  document.querySelector('.load-comments')?.addEventListener('click', () => {
+    const container = document.querySelector<HTMLElement>('#article-comments')!;
+    const script = document.createElement('script'); script.src = 'https://giscus.app/client.js'; script.async = true; script.crossOrigin = 'anonymous';
+    const theme = document.documentElement.dataset.theme || 'preferred_color_scheme';
+    const config = { repo: 'orime-org/breatic', 'repo-id': 'R_kgDOSMGoyg', category: 'Announcements', 'category-id': 'DIC_kwDOSMGoys4DLCsH', mapping: container.dataset.discussion ? 'number' : 'pathname', term: container.dataset.discussion || '', strict: '1', 'reactions-enabled': '1', 'emit-metadata': '0', 'input-position': 'top', theme, lang: 'en', loading: 'lazy' };
+    Object.entries(config).forEach(([key, value]) => script.setAttribute(`data-${key}`, value));
+    container.querySelector('button')?.remove(); container.appendChild(script);
+  }, { once: true });
+</script>

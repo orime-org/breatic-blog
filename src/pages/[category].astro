@@ -1,0 +1,9 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+export function getStaticPaths() { return [{ params: { category: 'engineering' }, props: { category: 'Engineering', intro: 'How things work, and the decisions behind them.' } }, { params: { category: 'product-updates' }, props: { category: 'Product Updates', intro: 'New capabilities and changes to the workspace.' } }]; }
+const { category, intro } = Astro.props;
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category)).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<Base title={category} description={intro}><section class="category-head wrap"><p class="eyebrow">Breatic Journal</p><h1>{category}</h1><p>{intro}</p></section><section class="wrap category-posts">{posts.length ? <PostList posts={posts} /> : <div class="empty"><h2>More from the workspace, soon.</h2><p>Published product updates will appear here. You can follow the journal through RSS.</p></div>}</section></Base>

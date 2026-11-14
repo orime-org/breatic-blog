@@ -1,9 +1,10 @@
 ---
+import Icon from './Icon.astro';
 import { community } from '../lib/site';
 const { number } = Astro.props;
 const url = number ? `${community}/${number}` : `${community}/categories/announcements`;
 ---
-<section class="comments" aria-labelledby="discussion-heading"><div class="section-heading"><h2 id="discussion-heading">Continue the conversation</h2><a href={url} target="_blank" rel="noopener noreferrer">Open on GitHub ↗</a></div><p>Questions about the implementation? Join the discussion. Reading is public; commenting requires a GitHub account.</p>
+<section class="comments" aria-labelledby="discussion-heading"><div class="section-heading"><h2 id="discussion-heading">Continue the conversation</h2><a class="icon-link" href={url} target="_blank" rel="noopener noreferrer">Open on GitHub <Icon name="external-link" /></a></div><p>Questions about the implementation? Join the discussion. Reading is public; commenting requires a GitHub account.</p>
 <div id="article-comments" data-discussion={number}>
   <button class="load-comments" type="button">Load comments from GitHub</button>
   <p class="comment-note">Comments are provided by giscus. Loading them connects to giscus and GitHub; signing in authorizes giscus to post your comments.</p>

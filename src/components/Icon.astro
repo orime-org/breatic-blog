@@ -1,0 +1,15 @@
+---
+// Lucide 0.468.0; see public/licenses/lucide.txt for the ISC notice.
+interface Props { name: 'external-link' | 'arrow-left' | 'arrow-right' | 'rss'; }
+const { name } = Astro.props;
+const paths = {
+  'external-link': ['M15 3h6v6', 'M10 14 21 3', 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'],
+  'arrow-left': ['m12 19-7-7 7-7', 'M19 12H5'],
+  'arrow-right': ['M5 12h14', 'm12 5 7 7-7 7'],
+  rss: ['M4 11a9 9 0 0 1 9 9', 'M4 4a16 16 0 0 1 16 16'],
+};
+---
+<svg class="icon" data-icon={name} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {paths[name].map((d) => <path d={d} />)}
+  {name === 'rss' && <circle cx="5" cy="19" r="1" />}
+</svg>

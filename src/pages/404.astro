@@ -1,4 +1,4 @@
 ---
-import Base from '../layouts/Base.astro'; import { path } from '../lib/site';
+import Base from '../layouts/Base.astro'; import Icon from '../components/Icon.astro'; import { path } from '../lib/site';
 ---
-<Base title="Page not found"><section class="category-head wrap"><p class="eyebrow">404</p><h1>This page isn't here.</h1><p>The article may have moved. Browse the journal to find it.</p><a class="text-link" href={path()}>Back to the journal ↗</a></section></Base>
+<Base title="Page not found"><section class="category-head wrap"><p class="eyebrow">404</p><h1>This page isn't here.</h1><p>The article may have moved. Browse the journal to find it.</p><a class="text-link" href={path()}><Icon name="arrow-left" /> Back to the journal</a></section></Base>

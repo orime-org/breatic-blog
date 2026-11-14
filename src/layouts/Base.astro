@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Icon from '../components/Icon.astro';
 import { siteName, description as defaultDescription, community, repository, path } from '../lib/site';
 const { title = siteName, description = defaultDescription, article = false, date } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -29,14 +30,14 @@ const image = new URL(path('images/social-card.png'), Astro.site);
       <a class="brand" href={path()} aria-label="Breatic Journal home"><img src={path('images/mark.svg')} width="34" height="34" alt="" /><span>Breatic<span class="brand-sub">Journal</span></span></a>
       <nav aria-label="Main navigation">
         <a href={path('engineering/')}>Engineering</a><a href={path('product-updates/')}>Product updates</a>
-        <a href={community} target="_blank" rel="noopener noreferrer">Community <span aria-hidden="true">↗</span></a>
+        <a class="icon-link" href={community} target="_blank" rel="noopener noreferrer">Community <Icon name="external-link" /></a>
         <button class="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">◐</button>
       </nav>
     </header>
     <main id="main"><slot /></main>
     <footer class="site-footer wrap">
       <div><a class="footer-brand" href={path()}>Breatic Journal</a><p>Building a shared space for creative work.</p></div>
-      <nav aria-label="Footer navigation"><a href="https://breatic.ai" target="_blank" rel="noopener noreferrer">Breatic ↗</a><a href={repository} target="_blank" rel="noopener noreferrer">Source ↗</a><a href={path('rss.xml')}>RSS ↗</a><a href="https://breatic.ai/privacy/" target="_blank" rel="noopener noreferrer">Privacy ↗</a></nav>
+      <nav aria-label="Footer navigation"><a class="icon-link" href="https://breatic.ai" target="_blank" rel="noopener noreferrer">Breatic <Icon name="external-link" /></a><a class="icon-link" href={repository} target="_blank" rel="noopener noreferrer">Source <Icon name="external-link" /></a><a class="icon-link" href={path('rss.xml')}>RSS <Icon name="rss" /></a><a class="icon-link" href="https://breatic.ai/privacy/" target="_blank" rel="noopener noreferrer">Privacy <Icon name="external-link" /></a></nav>
       <small>© {new Date().getUTCFullYear()} Orime, Inc.</small>
     </footer>
     <script>

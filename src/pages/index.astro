@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import PostList from '../components/PostList.astro';
 import { path, dateLabel } from '../lib/site';
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -9,8 +10,8 @@ const featured = posts.find((post) => post.id === 'trimming-web-animations') || 
 <Base>
   <section class="hero wrap"><p class="eyebrow"><span class="status-dot"></span> Notes from the people building Breatic</p><h1>Inside the<br /><span>creative workspace.</span></h1><p class="hero-intro">The ideas, engineering decisions, and product details behind collaborative AI creation.</p></section>
   {featured && <section class="feature wrap" aria-label="Featured article">
-    <a class="feature-visual" href={path(`${featured.id}/`)} aria-label={`Read ${featured.data.title}`}><div class="visual-head"><span>WEB ANIMATION</span><span>00:10</span></div><div class="art-stage"><span class="art-disc"></span><span class="art-square"></span><span class="art-triangle"></span></div><div class="visual-timeline"><span></span><b>03:00 <i>→</i> 06:00</b><span></span></div><p class="visual-caption">One source. Every cut is yours.</p></a>
-    <div class="feature-copy"><p class="eyebrow">{featured.data.category} · {dateLabel(featured.data.date)}</p><h2><a href={path(`${featured.id}/`)}>{featured.data.title}</a></h2><p>{featured.data.description}</p><a class="text-link" href={path(`${featured.id}/`)}>Read the story <span aria-hidden="true">↗</span></a></div>
+    <a class="feature-visual" href={path(`${featured.id}/`)} aria-label={`Read ${featured.data.title}`}><div class="visual-head"><span>WEB ANIMATION</span><span>00:10</span></div><div class="art-stage"><span class="art-disc"></span><span class="art-square"></span><span class="art-triangle"></span></div><div class="visual-timeline"><span></span><b>03:00 <Icon name="arrow-right" /> 06:00</b><span></span></div><p class="visual-caption">One source. Every cut is yours.</p></a>
+    <div class="feature-copy"><p class="eyebrow">{featured.data.category} · {dateLabel(featured.data.date)}</p><h2><a href={path(`${featured.id}/`)}>{featured.data.title}</a></h2><p>{featured.data.description}</p><a class="text-link" href={path(`${featured.id}/`)}>Read the story <Icon name="arrow-right" /></a></div>
   </section>}
-  <section class="latest wrap"><div class="section-heading"><h2>Latest notes</h2><a href={path('rss.xml')}>Follow via RSS ↗</a></div><PostList posts={posts} /></section>
+  <section class="latest wrap"><div class="section-heading"><h2>Latest notes</h2><a class="icon-link" href={path('rss.xml')}>Follow via RSS <Icon name="rss" /></a></div><PostList posts={posts} /></section>
 </Base>

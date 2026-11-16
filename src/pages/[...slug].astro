@@ -10,7 +10,7 @@ const { post } = Astro.props; const { Content, headings } = await render(post);
 const words = post.body?.split(/\s+/).length || 0;
 const json = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.data.title, description: post.data.description, datePublished: post.data.date.toISOString(), author: { '@type': 'Organization', name: post.data.author }, publisher: { '@type': 'Organization', name: 'Orime, Inc.' }, mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href };
 ---
-<Base title={post.data.title} description={post.data.description} article date={post.data.date}>
+<Base title={post.data.title} description={post.data.description} article date={post.data.date} postSlug={post.id}>
   <article>
     <header class="article-header wrap"><a class="back-link" href={path(post.data.category === 'Engineering' ? 'engineering/' : 'product-updates/')}><Icon name="arrow-left" /> {post.data.category}</a><p class="eyebrow">{post.data.category}</p><h1>{post.data.title}</h1><p class="article-deck">{post.data.description}</p><div class="byline"><span>{post.data.author}</span><time datetime={post.data.date.toISOString()}>{dateLabel(post.data.date)}</time><span>{Math.max(1, Math.ceil(words / 200))} min read</span></div></header>
     <div class="article-grid wrap"><aside class="article-aside"><p class="eyebrow">In this article</p><nav aria-label="Table of contents">{headings.filter((h) => h.depth === 2).map((h) => <a href={`#${h.slug}`}>{h.text}</a>)}</nav><a class="aside-rss icon-link" href={path('rss.xml')}>Follow the journal <Icon name="rss" /></a></aside><div class="article-body"><div class="prose"><Content /></div>{post.id === 'trimming-web-animations' && <TrimDemo />}<Comments number={post.data.discussion} /></div></div>

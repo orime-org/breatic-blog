@@ -4,7 +4,7 @@ description: Queue follow-ups by conversation, read them between model calls, an
 date: 2026-11-16
 category: Engineering
 author: Breatic team
-draft: true
+draft: false
 ---
 
 You ask an AI agent to design a poster. While it's working, you realize the layout needs to be vertical. If a generation request has already gone out, "make it vertical" can't change that request. It can still change what the agent does next.

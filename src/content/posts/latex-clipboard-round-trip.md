@@ -4,7 +4,7 @@ description: How Breatic preserves formula source across the clipboard, Markdown
 date: 2026-11-16
 category: Engineering
 author: Breatic team
-draft: true
+draft: false
 ---
 
 Copy two inline equations from a document and paste them somewhere else. They need to come back as two equations you can still edit. Rendering them correctly in the original paragraph tells you very little about whether that round trip will work.
